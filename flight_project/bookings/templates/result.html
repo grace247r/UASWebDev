@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Hasil Pencarian{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h3 class="mb-4 fw-bold text-dark"><i class="fas fa-list-ul me-2 text-primary"></i>Hasil Penerbangan</h3>
+
+    {% for flight in flights %}
+    <div class="custom-card mb-4">
+        <div class="card-body p-4">
+            <div class="row align-items-center h-100">
+                
+                <div class="col-md-2 text-center border-end">
+                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 80px; height: 80px;">
+                        <i class="fas fa-plane text-secondary fa-2x"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark mt-2">{{ flight.airline }}</h6>
+                </div>
+
+                <div class="col-md-6 px-4 border-end">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-center">
+                            <h3 class="mb-0 fw-bold">{{ flight.itineraries.0.segments.0.departure.iataCode }}</h3>
+                            <div class="badge bg-light text-dark mt-1">
+                                <i class="far fa-clock me-1"></i> {{ flight.itineraries.0.segments.0.departure.at|date:"H:i" }}
+                            </div>
+                        </div>
+
+                        <div class="flex-grow-1 text-center px-4 position-relative">
+                            <small class="text-muted fw-bold">{{ flight.itineraries.0.duration|slice:"2:" }}</small>
+                            <div class="position-relative my-2">
+                                <div style="border-top: 2px dashed #cbd5e0; width: 100%; position: absolute; top: 50%; z-index: 1;"></div>
+                                <i class="fas fa-plane text-primary position-relative bg-white px-2" style="z-index: 2; transform: rotate(90deg);"></i>
+                            </div>
+                            <small class="text-muted" style="font-size: 0.8rem;">Langsung</small>
+                        </div>
+
+                        <div class="text-center">
+                            {% with flight.itineraries.0.segments|last as last_segment %}
+                            <h3 class="mb-0 fw-bold">{{ last_segment.arrival.iataCode }}</h3>
+                            <div class="badge bg-light text-dark mt-1">
+                                <i class="far fa-clock me-1"></i> {{ last_segment.arrival.at|date:"H:i" }}
+                            </div>
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 text-center ps-4">
+                    <div class="d-flex flex-column justify-content-center h-100">
+                        <h3 class="text-primary fw-bold mb-0">Rp {{ flight.price_idr|intcomma }}</h3>
+                        <small class="text-muted mb-3">/pax</small>
+                        
+                        <div class="d-grid gap-2">
+                            <form action="{% url 'booking' %}" method="GET">
+                                <input type="hidden" name="airline" value="{{ flight.airline }}">
+                                <input type="hidden" name="price_idr" value="{{ flight.price_idr }}">
+    
+                                {% with flight.itineraries.0.segments|last as last_segment %}
+                                    <input type="hidden" name="origin" value="{{ flight.itineraries.0.segments.0.departure.iataCode }}">
+                                    <input type="hidden" name="destination" value="{{ last_segment.arrival.iataCode }}">
+                                    <input type="hidden" name="departure_time" value="{{ flight.itineraries.0.segments.0.departure.at|date:'Y-m-d H:i:s' }}">
+                                    <input type="hidden" name="arrival_time" value="{{ last_segment.arrival.at|date:'Y-m-d H:i:s' }}">
+                                    <input type="hidden" name="duration" value="{{ flight.itineraries.0.duration|slice:'2:' }}">
+                                {% endwith %}
+
+                                {% if flight.itineraries|length > 1 %}
+                                    {% with flight.itineraries.1.segments.0 as return_first %}
+                                    {% with flight.itineraries.1.segments|last as return_last %}
+                                        <input type="hidden" name="return_origin" value="{{ return_first.departure.iataCode }}">
+                                        <input type="hidden" name="return_destination" value="{{ return_last.arrival.iataCode }}">
+                                        <input type="hidden" name="return_departure_time" value="{{ return_first.departure.at|date:'Y-m-d H:i:s' }}">
+                                        <input type="hidden" name="return_arrival_time" value="{{ return_last.arrival.at|date:'Y-m-d H:i:s' }}">
+                                        <input type="hidden" name="return_duration" value="{{ flight.itineraries.1.duration|slice:'2:' }}">
+                                    {% endwith %}
+                                    {% endwith %}
+                                {% endif %}
+
+                                <button type="submit" class="btn btn-flight w-100 py-2">Pilih Tiket</button>
+                            </form>
+                            
+                            <button type="button" class="btn btn-outline-flight btn-sm border-0 text-muted" data-bs-toggle="modal" data-bs-target="#detailModal{{ forloop.counter }}">
+                                Lihat Detail Penerbangan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold">Detail Penerbangan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                     {% for itinerary in flight.itineraries %} 
+                        {% for segment in itinerary.segments %}
+                          <div class="flight-segment ps-3 border-start border-3 border-primary mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="mb-0 fw-bold">{{ segment.departure.iataCode }} <i class="fas fa-long-arrow-alt-right mx-2 text-muted"></i> {{ segment.arrival.iataCode }}</h5>
+                                <span class="badge bg-primary">{{ segment.carrierCode }}</span>
+                            </div>
+                            <p class="mb-1 text-muted"><i class="far fa-calendar-alt me-2"></i>{{ segment.departure.at|date:"d M Y" }}</p>
+                            <div class="row g-2 mt-2">
+                                <div class="col-6">
+                                    <div class="p-2 bg-light rounded text-center">
+                                        <small class="d-block text-muted">Berangkat</small>
+                                        <strong>{{ segment.departure.at|date:"H:i" }}</strong>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2 bg-light rounded text-center">
+                                        <small class="d-block text-muted">Tiba</small>
+                                        <strong>{{ segment.arrival.at|date:"H:i" }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+                        {% endfor %} 
+                      {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% empty %}
+    <div class="text-center py-5 bg-light rounded-3 mt-4">
+        <i class="fas fa-plane-slash fa-4x text-secondary mb-3"></i>
+        <h4 class="text-secondary fw-bold">Penerbangan tidak ditemukan</h4>
+        <p class="text-muted">Coba ganti tanggal atau rute pencarian Anda.</p>
+        <a href="{% url 'search' %}" class="btn btn-primary mt-3 px-4 rounded-pill">Ubah Pencarian</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

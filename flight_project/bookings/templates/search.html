@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Cari Penerbangan{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5" style="max-width: 600px;">
+    <div class="custom-card">
+        <div class="card-header-custom">
+            <h4><i class="fas fa-plane me-2"></i>Cari Penerbangan</h4>
+        </div>
+        <div class="card-body p-4">
+            {% if error %}
+            <div class="alert alert-danger rounded-pill text-center">{{ error }}</div>
+            {% endif %}
+
+            <form action="{% url 'results' %}" method="GET">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted small fw-bold">DARI</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i class="fas fa-plane-departure text-secondary"></i></span>
+                            <input type="text" id="origin" name="origin" class="form-control bg-light border-0" placeholder="Contoh: Jakarta" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted small fw-bold">KE</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i class="fas fa-plane-arrival text-secondary"></i></span>
+                            <input type="text" id="destination" name="destination" class="form-control bg-light border-0" placeholder="Contoh: Bali" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-bold">TANGGAL BERANGKAT</label>
+                    <input type="date" name="departure_date" class="form-control bg-light border-0" required>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="roundTripCheck" onclick="toggleReturn()">
+                    <label class="form-check-label text-muted">Pulang Pergi (Round Trip)</label>
+                </div>
+
+                <div class="mb-4" id="returnDateDiv" style="display: none;">
+                    <label class="form-label text-muted small fw-bold">TANGGAL KEMBALI</label>
+                    <input type="date" name="return_date" class="form-control bg-light border-0">
+                </div>
+
+                <button type="submit" class="btn btn-flight w-100 btn-lg shadow">
+                    Cari Sekarang <i class="fas fa-search ms-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="{% url 'home' %}" class="text-decoration-none text-muted"><i class="fas fa-arrow-left me-1"></i> Kembali ke Beranda</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function toggleReturn() {
+        var checkBox = document.getElementById("roundTripCheck");
+        var text = document.getElementById("returnDateDiv");
+        text.style.display = checkBox.checked ? "block" : "none";
+    }
+
+    $(document).ready(function() {
+        $("#origin, #destination").autocomplete({
+            source: "{% url 'city_search' %}",
+            minLength: 3, 
+            select: function(event, ui) {
+                $(this).val(ui.item.label); 
+                return false; 
+            },
+            focus: function(event, ui) {
+                return false;
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,137 @@
+
+:root {
+    --primary-color: #395886;
+    --secondary-color: #628ecb;
+    --accent-color: #f0f4f8;
+    --text-dark: #2c3e50;
+    --text-light: #ffffff;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--accent-color);
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Navbar & Footer */
+.navbar-custom {
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.navbar-brand {
+    font-weight: 600;
+    color: var(--primary-color) !important;
+}
+
+footer {
+    margin-top: auto;
+    background-color: white;
+    color: var(--text-dark);
+    padding: 20px 0;
+    border-top: 1px solid #eef2f7;
+}
+
+/* Hero Section (Homepage) */
+.hero-section {
+    /* Gradasi sesuai request */
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 80px 0 120px;
+    border-radius: 0 0 50% 50% / 40px; /* Lengkungan modern di bawah */
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.9;
+}
+
+/* Cards (Search, Result, Booking) */
+.main-content {
+    margin-top: -60px; /* Efek overlap ke atas hero */
+}
+
+.custom-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(57, 88, 134, 0.1);
+    background: white;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.custom-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header-custom {
+    background-color: white;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 20px;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-align: center;
+}
+
+/* Buttons */
+.btn-flight {
+    background-color: var(--secondary-color);
+    border: none;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-flight:hover {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 5px 15px rgba(98, 142, 203, 0.4);
+}
+
+.btn-outline-flight {
+    border: 2px solid var(--secondary-color);
+    color: var(--secondary-color);
+    border-radius: 50px;
+}
+
+.btn-outline-flight:hover {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+/* Flight Details in Result */
+.flight-segment {
+    position: relative;
+    padding-left: 20px;
+    border-left: 2px dashed var(--secondary-color);
+    margin-left: 10px;
+}
+
+.price-tag {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+/* Autocomplete UI Override */
+.ui-autocomplete {
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    border: none !important;
+    padding: 10px;
+    z-index: 9999;
+}
+.ui-menu-item .ui-menu-item-wrapper.ui-state-active {
+    background: var(--accent-color) !important;
+    color: var(--primary-color) !important;
+    border: none;
+    border-radius: 5px;
+}

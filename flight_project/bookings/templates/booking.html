@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Booking Penerbangan{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5" style="max-width: 900px;">
+    {% if success %}
+    <div class="custom-card text-center p-5">
+        <div class="mb-3 text-success">
+            <i class="fas fa-check-circle fa-5x"></i>
+        </div>
+        <h2 class="fw-bold text-dark">Booking Berhasil!</h2>
+        <p class="text-muted">Terima kasih, <strong>{{ name }}</strong>.</p>
+        <p class="text-muted">Nomor Paspor: {{ passport }} telah tercatat.</p>
+        <hr>
+        <a href="{% url 'home' %}" class="btn btn-flight btn-lg mt-3">Cari Penerbangan Lain</a>
+    </div>
+    {% else %}
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            
+            <div class="custom-card mb-3">
+                <div class="card-header-custom text-start bg-light d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-plane-departure me-2"></i>Penerbangan Pergi</h6>
+                    <span class="badge bg-primary">OUTBOUND</span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 text-center">
+                        <div>
+                            <h2 class="fw-bold text-primary mb-0">{{ origin }}</h2>
+                        </div>
+                        <div class="text-muted small">
+                            <span>{{ duration }}</span>
+                            <div style="border-top: 1px dashed #ccc; width: 50px; margin: 5px auto;"></div>
+                            <i class="fas fa-plane"></i>
+                        </div>
+                        <div>
+                            <h2 class="fw-bold text-primary mb-0">{{ destination }}</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-light p-3 rounded-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted small">Tanggal</span>
+                            <span class="fw-bold text-dark">{{ departure_time|date:"d M Y" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted small">Jam</span>
+                            <span class="fw-bold text-dark">{{ departure_time|date:"H:i" }} - {{ arrival_time|date:"H:i" }}</span>
+                        </div>
+                        <div class="mt-2 pt-2 border-top d-flex align-items-center">
+                            <i class="fas fa-plane-tail me-2 text-secondary"></i>
+                            <small class="fw-bold">{{ airline }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if is_round_trip %}
+            <div class="custom-card">
+                <div class="card-header-custom text-start bg-light d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-plane-arrival me-2"></i>Penerbangan Pulang</h6>
+                    <span class="badge bg-success">INBOUND</span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 text-center">
+                        <div>
+                            <h2 class="fw-bold text-primary mb-0">{{ return_origin }}</h2>
+                        </div>
+                        <div class="text-muted small">
+                            <span>{{ return_duration }}</span>
+                            <div style="border-top: 1px dashed #ccc; width: 50px; margin: 5px auto;"></div>
+                            <i class="fas fa-plane fa-flip-horizontal"></i>
+                        </div>
+                        <div>
+                            <h2 class="fw-bold text-primary mb-0">{{ return_destination }}</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-light p-3 rounded-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted small">Tanggal</span>
+                            <span class="fw-bold text-dark">{{ return_departure_time|date:"d M Y" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted small">Jam</span>
+                            <span class="fw-bold text-dark">{{ return_departure_time|date:"H:i" }} - {{ return_arrival_time|date:"H:i" }}</span>
+                        </div>
+                        <div class="mt-2 pt-2 border-top d-flex align-items-center">
+                            <i class="fas fa-plane-tail me-2 text-secondary"></i>
+                            <small class="fw-bold">{{ airline }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <div class="col-md-6">
+            <div class="custom-card bg-primary text-white p-4 mb-4" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <span class="d-block fw-bold"><i class="fas fa-tag me-2"></i>Total Pembayaran</span>
+                        <small class="opacity-75">
+                            {% if is_round_trip %}
+                                Paket Pulang - Pergi
+                            {% else %}
+                                Sekali Jalan
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div class="text-end">
+                        <h2 class="fw-bold mb-0">Rp {{ price_idr|intcomma }}</h2>
+                    </div>
+                </div>
+                <hr style="border-top: 1px dashed rgba(255,255,255,0.5); opacity: 1;">
+                <div class="d-flex justify-content-between small opacity-75">
+                    <span>Status Harga</span>
+                    <span>Sudah termasuk pajak & biaya</span>
+                </div>
+            </div>
+
+            <div class="custom-card">
+                <div class="card-header-custom text-start">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-user-edit me-2"></i>Data Penumpang</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">NAMA LENGKAP (Sesuai Paspor)</label>
+                            <input type="text" name="name" class="form-control py-3 bg-light border-0" placeholder="Contoh: Budi Santoso" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-muted small fw-bold">NOMOR PASPOR / KTP</label>
+                            <input type="text" name="passport" class="form-control py-3 bg-light border-0" placeholder="Contoh: A12345678" required>
+                        </div>
+                        <button type="submit" class="btn btn-flight w-100 btn-lg shadow-sm">
+                            Konfirmasi Booking <i class="fas fa-check-circle ms-2"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
